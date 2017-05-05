@@ -1,0 +1,39 @@
+function buildHtml(str) {
+    switch (str) {
+        case "ejs_for_add_part_category":
+            var header = '';
+            var body = '';
+
+            // concatenate header string
+            // concatenate body string
+
+            return '<!DOCTYPE html>'
+                + '<html><head>'
+                + '<meta charset="UTF-8">'
+                + '</head><body>'
+                + 'hello'
+                + '<form method="post" action="/add_part" enctype="multipart/form-data">'
+                + '<input name="part_name" type="text">'
+                + '<br>'
+                + '<input name="part_category" type="hidden" value=<%= part_category%>>'
+                + '이미지 업로드 <input type="file" name="img"/><br>'
+                + '파일 업로드 <input type="file" name="file"/><br>'
+                + '<button type="submit">' + "submit"
+                + '</button>'
+                + '</form>'
+                + '<%for(var i=0;i<length;i++){%><%= data[i]%><br><%}%>'
+                + '</body></html>';
+            break;
+        default:
+            var header = '';
+            var body = '';
+
+            // concatenate header string
+            // concatenate body string
+
+            return '<!DOCTYPE html>'
+                + '<html><header>' + header + '</header><body>' + body + '</body></html>';
+            break;
+    }
+};
+module.exports.buildHtml = buildHtml;
