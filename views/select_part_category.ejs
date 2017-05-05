@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<%
+for(var i = 0;i < length;i++){
+%>
+<form method="get" action="/go_part_category">
+    <input type="hidden" name="part_category" value="<%= data[i].part_category %>">
+    <button type="submit"><%= data[i].part_category %></button>
+    <br><br>
+</form>
+<%
+}
+%>
+</body>
+</html>
