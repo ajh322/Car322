@@ -204,6 +204,8 @@ app.get('/get_part', function (req, res) {
     })
 });
 app.post('/get_part_by_car_name', function (req, res) {
+    console.log(req.body);
+    console.log(req.body.car_name);
     part.find({car_name:req.body.car_name}).exec(function (err, doc) {
         res.end(JSON.stringify(doc));
     })
