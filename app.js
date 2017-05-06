@@ -198,6 +198,11 @@ app.get('/go_part_category', function (req, res) {
         res.render(req.query.part_category, {data: doc, length: doc.length, part_category: req.query.part_category});
     })
 });
+app.post('/get_part', function (req, res) {
+    part.find({}).exec(function (err, doc) {
+        res.end(JSON.stringify(doc));
+    })
+});
 app.post('/get_part_by_car_name', function (req, res) {
     part.find({car_name:req.body.car_name}).exec(function (err, doc) {
         res.end(JSON.stringify(doc));
