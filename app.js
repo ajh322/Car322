@@ -7,12 +7,12 @@ mongoose.Promise = global.Promise;
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var htmlBuilder = require('./modules/html-builder');
-var ip="35.160.55.61";
-var server_url = ip+":8080";
-var conn = mongoose.createConnection(ip+'/car');
+var ip = "35.160.55.61";
+var server_url = ip + ":8080";
+var conn = mongoose.createConnection(ip + '/car');
 var autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(conn);
-var Car = require('./models/car');
+var car = require('./models/car');
 var part_category = require('./models/part_category');
 var part = require('./models/part');
 var const_case = require('./models/construction_case');
@@ -128,6 +128,7 @@ app.post('/get_const_case', function (req, res) {
         res.end(JSON.stringify(docs));
     })
 })
+//시공사례 삭제
 app.get('/const_case_remove', function (req, res) {
     const_case.remove({}, function (err, doc) {
         res.end(JSON.stringify(doc));
@@ -135,16 +136,20 @@ app.get('/const_case_remove', function (req, res) {
 })
 //파트 카테고리 추가
 app.post('/insert_part_category', function (req, res) {
-    console.log("inserted");
     if (req.body.part_category != "") {
         conn.collection('part_category').insert({part_category: req.body.part_category});
-        fs.writeFile(__dirname + "/views/" + req.body.part_category + ".ejs", htmlBuilder.buildHtml("ejs_for_add_part_category"), function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("The file was saved!");
+        /*  차량중심 데이터 등록으로 인하여 바뀜
+         fs.writeFile(__dirname + "/views/" + req.body.part_category + ".ejs", htmlBuilder.buildHtml("ejs_for_add_part_category"), function (err) {
+         if (err) {
+         return console.log(err);
+         }
+         console.log("The file was saved!");
+         });
+         */
+        part_category.find({}).exec(function (err, doc) {
+            console.log(doc)
+            res.redirect('/add_part_category');
         });
-        res.redirect("/select_part_category");
     }
     else {
         res.end("잘못된 입력");
@@ -165,7 +170,20 @@ app.get('/get_part_category', function (req, res) {
         res.end(JSON.stringify(doc));
     })
 });
+//파트 카테고리 리셋
+app.get('/reset_part_category', function (req, res) {
+    //아래 기본 파트카테고리가 아닌것 전부다 불러오기
+    part_category.find({
+        part_category: {
+            '$nin': ["frontbumper", "bodykit", "headlight", "taillight", "wheel", "hood", "spoiler", "grill", "allled", "roof", "tint", "rearbumper", "sidemirror", "sidekirt "]
+        }
+    }).remove().exec(function (err) {
+        part_category.find({}).exec(function (err) {
+            res.redirect('/add_part_category');
+        })
+    });
 
+});
 //파트 카테고리 페이지 선택하는곳
 app.get('/select_part_category', function (req, res) {
     part_category.find({}).exec(function (err, doc) {
@@ -180,25 +198,67 @@ app.get('/go_part_category', function (req, res) {
         res.render(req.query.part_category, {data: doc, length: doc.length, part_category: req.query.part_category});
     })
 });
-app.get('/get_part', function (req, res) {
-    part.find({}).exec(function (err, doc) {
+app.post('/get_part_by_car_name', function (req, res) {
+    part.find({car_name:req.body.car_name}).exec(function (err, doc) {
         res.end(JSON.stringify(doc));
     })
+});
+app.post('/get_part_by_category', function (req, res) {
+    part.find({part_category:req.body.part_category}).exec(function (err, doc) {
+        res.end(JSON.stringify(doc));
+    })
+});
+//차량추가 페이지
+app.get('/add_car', function (req, res) {
+    car.find({}).exec(function (err, doc) {
+        res.render('add_car', {data: doc, length: doc.length});
+    })
+});
+//차량 추가
+app.post('/add_car', function (req, res) {
+    if (req.body.car_name != "") {
+        conn.collection('car').insert({car_name: req.body.car_name});
+        res.redirect("/add_car");
+    }
+    else {
+        res.end("잘못된 입력");
+    }
+})
+//파트 추가하는 페이지
+app.get('/add_part', function (req, res) {
+    part_category.find({}).exec(function (err, doc) {
+        car.find({}).exec(function (err, doc_l) {
+            res.render('add_part', {
+                part_data: doc,
+                part_data_length: doc.length,
+                car_data: doc_l,
+                car_data_length: doc_l.length
+            });
+        });
+    });
 });
 //파트 추가하기
 var add_part_upload = upload_main.fields([{name: 'img', maxCount: 1}, {name: 'file', maxCount: 1}]);
 app.post('/add_part', add_part_upload, function (req, res, next) {
-    conn.collection('part').insert({
-        part_category: req.body.part_category,
-        part_name: req.body.part_name,
-        img_url: server_url + req.files.img[0].path.split('public')[1],
-        file_url: server_url + req.files.file[0].path.split('public')[1]
-    });
-    part.find({part_category: req.body.part_category}).exec(function (err, doc) {
-        console.log(server_url + req.files.img[0].path.split('public')[1]);
-        console.log(req.files);
-        res.render(req.body.part_category, {data: doc, length: doc.length, part_category: req.body.part_category});
-    })
+    console.log(req.files);
+        try {
+            conn.collection('part').insert({
+                part_category: req.body.part_category,
+                part_name: req.body.part_name,
+                car_name: req.body.car_name,
+                img_url: server_url + req.files.img[0].path.split('public')[1],
+                file_url: server_url + req.files.file[0].path.split('public')[1]
+            });
+        } catch (e) {
+            conn.collection('part').insert({
+                part_category: req.body.part_category,
+                part_name: req.body.part_name,
+                car_name: req.body.car_name,
+            });
+
+        }
+
+        res.redirect('./add_part')
 })
 app.listen(app.get('port'), function () {
     console.log("going");

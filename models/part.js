@@ -6,6 +6,7 @@ var conn = mongoose.createConnection('35.160.55.61/car');
 var userSchema = new mongoose.Schema({
     part_name: {type: String},
     part_category: {type: String, default: ""},
+    car_name:{type:String},
     img_url:{type:String},
     file_url:{type:String}
 });

@@ -5,14 +5,14 @@
     <title>Title</title>
 </head>
 <body>
-<%
-for(var i = 0;i < length;i++){
-%>
-<form method="get" action="/go_part_category">
-    <input type="hidden" name="part_category" value="<%= data[i].part_category %>">
-    <button type="submit"><%= data[i].part_category %></button>
-    <br><br>
+<form method="post" action="/add_car">
+    <input type="text" name=car_name placeholder="차량명">
+    <button type="submit">submit</button>
 </form>
+<%
+for(var i=0;i<length;i++){
+%>
+<%= data[i]%>
 <%
 }
 %>
