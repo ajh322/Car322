@@ -134,6 +134,12 @@ app.get('/const_case_remove', function (req, res) {
         res.end(JSON.stringify(doc));
     });
 })
+//파트 삭제
+app.get('/part_remove', function (req, res) {
+    part.remove({}, function (err, doc) {
+        res.end(JSON.stringify(doc));
+    });
+})
 //파트 카테고리 추가
 app.post('/insert_part_category', function (req, res) {
     if (req.body.part_category != "") {
@@ -207,6 +213,7 @@ app.post('/get_part_by_car_name', function (req, res) {
     console.log(req.body);
     console.log(req.body.car_name);
     part.find({car_name:req.body.car_name}).exec(function (err, doc) {
+        console.log(doc);
         res.end(JSON.stringify(doc));
     })
 });
