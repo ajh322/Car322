@@ -134,9 +134,15 @@ app.get('/const_case_remove', function (req, res) {
         res.end(JSON.stringify(doc));
     });
 })
+//파트 삭제하는 페이지로 이동
+app.get('/manage_part', function (req, res) {
+    part.find({}).exec(function (err, doc) {
+        res.render('manage_part', {part: doc, length: doc.length});
+    })
+});
 //파트 삭제
-app.get('/part_remove', function (req, res) {
-    part.remove({}, function (err, doc) {
+app.post('/part_remove', function (req, res) {
+    part.remove({_id:req.body._id}, function (err, doc) {
         res.end(JSON.stringify(doc));
     });
 })

@@ -5,17 +5,23 @@
     <title>Title</title>
 </head>
 <body>
-<form method="post" action="/add_car">
-    <input type="text" name=car_name placeholder="차량명">
-    <button type="submit">submit</button>
+<form method="post" action="/part_remove">
+    <br>
+    파트 id
+    <select name="_id">
+        <%
+        for(var i=0;i<length;i++){
+        %>
+        <option value="<%= part[i]._id %>">
+            <%= part[i] %>
+        </option>
+        <%
+        }
+        %>
+    </select>
+    <br>
+    <button type="submit">remove(주의!!!)</button>
 </form>
-<%
-for(var i=0;i<length;i++){
-%>
-<%= data[i]%>
-<%
-}
-%>
 <br>
 <a href="/add_part">파트 추가</a><br>
 <a href="/get_part">파트 받아오기(json)</a><br>
